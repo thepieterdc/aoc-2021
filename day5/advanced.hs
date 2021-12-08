@@ -16,11 +16,11 @@ parseInt :: String -> Int
 parseInt a = read a :: Int
 
 parse :: [String] -> [Line]
-parse input = map parseLine input
+parse = map parseLine
 
 parseLine :: String -> Line
 parseLine row = (parsePoint start, parsePoint end)
-    where (start, end) = ((takeWhile (/= '-') row), tail (dropWhile (/= '>') row))
+    where (start, end) = (takeWhile (/= '-') row, tail (dropWhile (/= '>') row))
 
 parsePoint :: String -> Point
 parsePoint part = (parseInt x, parseInt (tail y))
@@ -33,44 +33,40 @@ generatePointsForLine :: Line -> [Point]
 generatePointsForLine ((x1, y1), (x2, y2)) = case (x1 == x2, y1 == y2) of
     (True, _) -> generateVerticalLine (x1, y1) (x2, y2)
     (_, True) -> generateHorizontalLine (x1, y1) (x2, y2)
-    otherwise -> generateDiagonalLine (x1, y1) (x2, y2)
+    _ -> generateDiagonalLine (x1, y1) (x2, y2)
 
 generateDiagonalLine :: Point -> Point -> [Point]
 generateDiagonalLine (x1, y1) (x2, y2)
-    | (x1 == x2) = [(x2, y2)]
-    | (x1 < x2 && y1 < y2) = [(x1, y1)] ++ generateDiagonalLine (x1 + 1, y1 + 1) (x2, y2)
-    | (x1 < x2 && y1 > y2) = [(x1, y1)] ++ generateDiagonalLine (x1 + 1, y1 - 1) (x2, y2)
-    | (x1 > x2 && y1 < y2) = [(x1, y1)] ++ generateDiagonalLine (x1 - 1, y1 + 1) (x2, y2)
-    | otherwise = [(x1, y1)] ++ generateDiagonalLine (x1 - 1, y1 - 1) (x2, y2)
+    | x1 == x2 = [(x2, y2)]
+    | x1 < x2 && y1 < y2 = (x1, y1) : generateDiagonalLine (x1 + 1, y1 + 1) (x2, y2)
+    | x1 < x2 && y1 > y2 = (x1, y1) : generateDiagonalLine (x1 + 1, y1 - 1) (x2, y2)
+    | x1 > x2 && y1 < y2 = (x1, y1) : generateDiagonalLine (x1 - 1, y1 + 1) (x2, y2)
+    | otherwise = (x1, y1) : generateDiagonalLine (x1 - 1, y1 - 1) (x2, y2)
 
 generateHorizontalLine :: Point -> Point -> [Point]
 generateHorizontalLine (x1, y) (x2, _)
-    | (x1 == x2) = [(x2, y)]
-    | (x1 < x2) = [(x1, y)] ++ generateHorizontalLine (x1 + 1, y) (x2, y)
-    | otherwise = [(x1, y)] ++ generateHorizontalLine (x1 - 1, y) (x2, y)
+    | x1 == x2 = [(x2, y)]
+    | x1 < x2 = (x1, y) : generateHorizontalLine (x1 + 1, y) (x2, y)
+    | otherwise = (x1, y) : generateHorizontalLine (x1 - 1, y) (x2, y)
 
 generateVerticalLine :: Point -> Point -> [Point]
 generateVerticalLine (x, y1) (_, y2)
-    | (y1 == y2) = [(x, y2)]
-    | (y1 < y2) = [(x, y1)] ++ generateVerticalLine (x, y1 + 1) (x, y2)
-    | otherwise = [(x, y1)] ++ generateVerticalLine (x, y1 - 1) (x, y2)
-
-flatten :: [[Point]] -> [Point]
-flatten [] = []
-flatten (x:xs) = x ++ flatten xs
+    | y1 == y2 = [(x, y2)]
+    | y1 < y2 = (x, y1) : generateVerticalLine (x, y1 + 1) (x, y2)
+    | otherwise = (x, y1) : generateVerticalLine (x, y1 - 1) (x, y2)
 
 frequencies :: [Point] -> Maybe (Point, Int) -> [(Point, Int)]
 frequencies [] (Just (p, i)) = [(p, i)]
 frequencies (x:xs) Nothing = frequencies xs (Just (x, 1))
 frequencies (x:xs) (Just (p, i))
-    | (x == p) = frequencies xs (Just (x, i + 1))
-    | otherwise = [(p, i)] ++ (frequencies xs (Just (x, 1)))
+    | x == p = frequencies xs (Just (x, i + 1))
+    | otherwise = (p, i) : frequencies xs (Just (x, 1))
 
 filterMultiple :: [(Point, Int)] -> [(Point, Int)]
-filterMultiple = filter (\p -> (snd p) > 1)
+filterMultiple = filter (\p -> snd p > 1)
 
 main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    putStrLn $ show $ length $ filterMultiple (frequencies (quicksort (flatten (generatePoints (parse (lines contents))))) Nothing)
+    print (length $ filterMultiple (frequencies (quicksort (concat (generatePoints (parse (lines contents))))) Nothing))

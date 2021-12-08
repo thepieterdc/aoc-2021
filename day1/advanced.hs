@@ -27,4 +27,4 @@ main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    putStrLn $ show $ run (slidingWindowify (map parseInt (lines contents)))
+    print (run (slidingWindowify (map parseInt (lines contents))))

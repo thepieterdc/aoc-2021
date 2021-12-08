@@ -20,4 +20,4 @@ main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    putStrLn $ show $ run (map parseInt (lines contents))
+    print (run (map parseInt (lines contents)))

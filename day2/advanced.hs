@@ -44,4 +44,4 @@ main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    putStrLn $ show $ mul $ calculatePosition (map parseInstructionLine (lines contents)) 0 0 0
+    print (mul $ calculatePosition (map parseInstructionLine (lines contents)) 0 0 0)

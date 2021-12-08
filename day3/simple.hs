@@ -14,9 +14,9 @@ maxIdx (zeros, ones)
     | zeros > ones = "0"
     | otherwise = "1"
 
-runForIdx :: [[Char]] -> Int -> Int -> Int -> (Int, Int)
+runForIdx :: [String] -> Int -> Int -> Int -> (Int, Int)
 runForIdx (x : xs) idx zeros ones
-    | ((x !! idx) == '0') = runForIdx xs idx (zeros + 1) ones
+    | (x !! idx) == '0' = runForIdx xs idx (zeros + 1) ones
     | otherwise = runForIdx xs idx zeros (ones + 1)
 runForIdx [] _ zeros ones = (zeros, ones)
 
@@ -24,7 +24,7 @@ binaryInterpret :: String -> (Int, Int)
 binaryInterpret i = (binaryToNumber i, binaryToNumber (binaryFlip i))
 
 binaryFlip :: String -> String
-binaryFlip xs = map flip xs
+binaryFlip = map flip
     where flip x = if x == '0' then '1' else '0'
 
 binaryToNumber :: String -> Int
@@ -38,4 +38,4 @@ main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    putStrLn $ show $ mul $ binaryInterpret (run ((lineLength (lines contents))))
+    print (mul $ binaryInterpret (run (lineLength (lines contents))))

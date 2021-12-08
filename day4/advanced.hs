@@ -22,34 +22,34 @@ parse input = Configuration (parseGuesses (head input)) (parseBoards (tail (tail
 
 parseBoards :: [String] -> [Board]
 parseBoards [] = []
-parseBoards input = (parseBoard (take 5 input)) : parseBoards (drop 6 input)
+parseBoards input = parseBoard (take 5 input) : parseBoards (drop 6 input)
 
 parseBoard :: [String] -> Board
-parseBoard input = map parseRow input
+parseBoard = map parseRow
 
 parseRow :: String -> Row
 parseRow input = map parseCell (words input)
 
 parseGuesses :: String -> [String]
-parseGuesses input = (parseCell x) : next
+parseGuesses input = parseCell x : next
     where 
     (x, next)
-        | rest == [] = (x, [])
+        | null rest = (x, [])
         | otherwise = (x, parseGuesses (tail rest))
         where (x, rest) = span (/= ',') input
 
 runGame :: Configuration -> Maybe (Board, Int)
-runGame (Configuration (move : moves) [board]) = case winner newBoard of
-        True -> Just (newBoard, parseInt move)
-        False -> runGame (Configuration moves [newBoard])
+runGame (Configuration (move : moves) [board]) = if winner newBoard 
+        then Just (newBoard, parseInt move)
+        else runGame (Configuration moves [newBoard])
     where newBoard = applyMove move board
 runGame (Configuration (move : moves) boards) = runGame (Configuration moves (filterNeg winner (map (applyMove move) boards)))
 
 applyMove :: String -> Board -> Board
-applyMove move board = map (applyMoveToRow move) board
+applyMove move = map (applyMoveToRow move)
 
 applyMoveToRow :: String -> Row -> Row
-applyMoveToRow move row = map (\c -> if c == move then "X" else c) row
+applyMoveToRow move = map (\c -> if c == move then "X" else c)
 
 findWinner :: [Board] -> Maybe Board
 findWinner [] = Nothing
@@ -58,26 +58,26 @@ findWinner (board : boards)
     | otherwise = findWinner boards
 
 winner :: Board -> Bool
-winner board = (winnerHorizontal board) || (winnerVertical board)
+winner board = winnerHorizontal board || winnerVertical board
 
 winnerHorizontal :: Board -> Bool
-winnerHorizontal board = or (map winnerHorizontalRow board)
+winnerHorizontal = any winnerHorizontalRow
 
 winnerHorizontalRow :: Row -> Bool
 winnerHorizontalRow = all (== "X")
 
 winnerVertical :: Board -> Bool
-winnerVertical board = or (map (winnerVerticalColumn board) [0..(length (head board)-1)])
+winnerVertical board = any (winnerVerticalColumn board) [0..(length (head board)-1)]
 
 winnerVerticalColumn :: Board -> Int -> Bool
-winnerVerticalColumn board column = and (map (winnerRowColumn column) board)
+winnerVerticalColumn board column = all (winnerRowColumn column) board
 
 winnerRowColumn :: Int -> Row -> Bool
 winnerRowColumn column row = row !! column == "X"
 
 result :: Maybe (Board, Int) -> Int
 result Nothing = 0
-result (Just (board, lastMove)) = (boardSum board) * lastMove
+result (Just (board, lastMove)) = boardSum board * lastMove
 
 boardSum :: Board -> Int
 boardSum board = sum (map rowSum board)
@@ -89,4 +89,4 @@ main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    putStrLn $ show $ result (runGame (parse (lines contents)))
+    print (result (runGame (parse (lines contents))))
