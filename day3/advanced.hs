@@ -35,11 +35,8 @@ binaryToNumber :: String -> Int
 binaryToNumber = foldr (\c s -> s * 2 + c) 0 . reverse . map c2i
     where c2i c = if c == '0' then 0 else 1
 
-mul :: (Int, Int) -> Int
-mul (a, b) = a * b
-
 main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    print (mul (findOxygen (lineLength (lines contents)), findCO2(lineLength (lines contents))))
+    print (product [findOxygen (lineLength (lines contents)), findCO2(lineLength (lines contents))])

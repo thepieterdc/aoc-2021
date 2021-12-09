@@ -2,8 +2,7 @@ module Main where
 
 import System.Environment
 
-parseInt :: String -> Int
-parseInt a = read a :: Int
+import Utils.Parsing (parseInt)
 
 parseCell :: String -> String
 parseCell = show . parseInt

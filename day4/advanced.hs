@@ -2,10 +2,8 @@ module Main where
 
 import System.Environment
 
-parseInt :: String -> Int
-parseInt a = read a :: Int
-
-filterNeg f = filter (not . f)
+import Utils.Filtering (filterNot)
+import Utils.Parsing (parseInt)
 
 parseCell :: String -> String
 parseCell = show . parseInt
@@ -43,7 +41,7 @@ runGame (Configuration (move : moves) [board]) = if winner newBoard
         then Just (newBoard, parseInt move)
         else runGame (Configuration moves [newBoard])
     where newBoard = applyMove move board
-runGame (Configuration (move : moves) boards) = runGame (Configuration moves (filterNeg winner (map (applyMove move) boards)))
+runGame (Configuration (move : moves) boards) = runGame (Configuration moves (filterNot winner (map (applyMove move) boards)))
 
 applyMove :: String -> Board -> Board
 applyMove move = map (applyMoveToRow move)

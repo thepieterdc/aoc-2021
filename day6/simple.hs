@@ -2,8 +2,7 @@ module Main where
 
 import System.Environment
 
-parseInt :: String -> Int
-parseInt a = read a :: Int
+import Utils.Parsing (parseInt)
 
 parse :: String -> [Int]
 parse input = parseInt x : (if rest /= [] then parse (tail rest) else [])

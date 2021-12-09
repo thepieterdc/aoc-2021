@@ -2,8 +2,7 @@ module Main where
 
 import System.Environment
 
-parseInt :: String -> Int
-parseInt a = read a :: Int
+import Utils.Parsing (parseInt)
 
 data Direction = Down | Forward | Up
                deriving (Eq, Show)
@@ -29,15 +28,12 @@ instructionHoriz :: Instruction -> Int
 instructionHoriz (Instruction Forward x) = x
 instructionHoriz _ = 0
 
-calculatePosition :: [Instruction] -> Int -> Int -> (Int, Int)
+calculatePosition :: [Instruction] -> Int -> Int -> [Int]
 calculatePosition (x:xs) d h = calculatePosition xs (d + instructionDepth x) (h + instructionHoriz x)
-calculatePosition _ d h = (d, h)
-
-mul :: (Int, Int) -> Int
-mul (a, b) = a * b
+calculatePosition _ d h = [d, h]
 
 main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    print (mul $ calculatePosition (map parseInstructionLine (lines contents)) 0 0)
+    print (product $ calculatePosition (map parseInstructionLine (lines contents)) 0 0)

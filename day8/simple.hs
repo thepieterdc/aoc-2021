@@ -3,9 +3,8 @@ module Main where
 import Data.List
 import System.Environment
 
-quicksort :: (Ord a) => [a] -> [a]
-quicksort [] = []
-quicksort (x:xs) = quicksort [y | y <- xs, y <= x] ++ [x] ++ quicksort [y | y <- xs, y > x]
+import Utils.Filtering (filterByLength)
+import Utils.Sorting (quicksort)
 
 -- Increase legibility.
 type Zero = String
@@ -49,9 +48,6 @@ findSeven = head . filterByLength 3
 
 findEight :: [String] -> Eight
 findEight = head . filterByLength 7
-
-filterByLength :: Int -> [String] -> [String]
-filterByLength len = filter (\d -> length d == len)
 
 run :: [Observation] -> Int
 run = sum . map runObservation

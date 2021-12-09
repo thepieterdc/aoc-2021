@@ -2,6 +2,8 @@ module Main where
 
 import System.Environment
 
+import Utils.Binary (binaryFlip, binaryToNumber)
+
 lineLength :: [String] -> ([String], Int)
 lineLength x = (x, length (head x))
 
@@ -20,22 +22,11 @@ runForIdx (x : xs) idx zeros ones
     | otherwise = runForIdx xs idx zeros (ones + 1)
 runForIdx [] _ zeros ones = (zeros, ones)
 
-binaryInterpret :: String -> (Int, Int)
-binaryInterpret i = (binaryToNumber i, binaryToNumber (binaryFlip i))
-
-binaryFlip :: String -> String
-binaryFlip = map flip
-    where flip x = if x == '0' then '1' else '0'
-
-binaryToNumber :: String -> Int
-binaryToNumber = foldr (\c s -> s * 2 + c) 0 . reverse . map c2i
-    where c2i c = if c == '0' then 0 else 1
-
-mul :: (Int, Int) -> Int
-mul (a, b) = a * b
+binaryInterpret :: String -> [Int]
+binaryInterpret i = [binaryToNumber i, binaryToNumber (binaryFlip i)]
 
 main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    print (mul $ binaryInterpret (run (lineLength (lines contents))))
+    print (product $ binaryInterpret (run (lineLength (lines contents))))

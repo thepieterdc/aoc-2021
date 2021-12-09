@@ -2,8 +2,7 @@ module Main where
 
 import System.Environment
 
-average :: [Double] -> Double
-average inputs = sum inputs / fromIntegral (length inputs)
+import Utils.Stat (average, naturalSum)
 
 window :: Int -> [Int]
 window i = [(i - 20)..(i + 20)]
@@ -16,21 +15,10 @@ parse input = parseInt x : (if rest /= [] then parse (tail rest) else [])
     where (x, rest) = span (/= ',') input
 
 distance :: [Int] -> Int -> Int
-distance inputs x = sum [sumNaturals (abs(x - y)) | y <- inputs]
-
-sumNaturals :: Int -> Int
-sumNaturals n = round (fromIntegral (n * (n + 1))) / 2
-
-minList :: [Int] -> Int
-minList [] = 0
-minList [x] = x
-minList (x:y:xs)
-    | x > y = minList (y:xs)
-    | x < y = minList (x:xs)
-    | otherwise = minList (x:xs)
+distance inputs x = sum [naturalSum (abs(x - y)) | y <- inputs]
 
 run :: [Int] -> Int
-run input = minList (map (distance input) (window (round (average (map fromIntegral input)))))
+run input = minimum (map (distance input) (window (round (average (map fromIntegral input)))))
 
 main :: IO ()
 main = do

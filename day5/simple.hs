@@ -1,19 +1,13 @@
 module Main where
 
+import Data.Set(Set)
+import qualified Data.Set as Set
 import System.Environment
 
-quicksort :: (Ord a) => [a] -> [a]
-quicksort [] = []
-quicksort (x:xs) = quicksort [y | y <- xs, y <= x] ++ [x] ++ quicksort [y | y <- xs, y > x]
-
-type Point = (Int, Int)
-
-type Line = (Point, Point)
-
-filterNeg f = filter (not . f)
-
-parseInt :: String -> Int
-parseInt a = read a :: Int
+import Utils.Geometry.Base (Coordinate)
+import Utils.Geometry.Line (getCoordinates, isDiagonal, Line)
+import Utils.Filtering (filterNot)
+import Utils.Parsing (parseInt)
 
 parse :: [String] -> [Line]
 parse = map parseLine
@@ -22,49 +16,24 @@ parseLine :: String -> Line
 parseLine row = (parsePoint start, parsePoint end)
     where (start, end) = (takeWhile (/= '-') row, tail (dropWhile (/= '>') row))
 
-parsePoint :: String -> Point
+parsePoint :: String -> Coordinate
 parsePoint part = (parseInt x, parseInt (tail y))
     where (x, y) = span (/= ',') part
 
 filterDiag :: [Line] -> [Line]
-filterDiag = filterNeg isDiagonal
+filterDiag = filterNot isDiagonal
 
-isDiagonal :: Line -> Bool
-isDiagonal ((x1, y1), (x2, y2)) = (x1 /= x2) && (y1 /= y2)
+generatePoints :: [Line] -> [[Coordinate]]
+generatePoints = map getCoordinates
 
-generatePoints :: [Line] -> [[Point]]
-generatePoints = map generatePointsForLine
-
-generatePointsForLine :: Line -> [Point]
-generatePointsForLine ((x1, y1), (x2, y2)) = 
-    if x1 == x2
-        then generateVerticalLine (x1, y1) (x2, y2)
-        else generateHorizontalLine (x1, y1) (x2, y2)
-
-generateHorizontalLine :: Point -> Point -> [Point]
-generateHorizontalLine (x1, y) (x2, _)
-    | x1 == x2 = [(x2, y)]
-    | x1 < x2 = (x1, y) : generateHorizontalLine (x1 + 1, y) (x2, y)
-    | otherwise = (x1, y) : generateHorizontalLine (x1 - 1, y) (x2, y)
-
-generateVerticalLine :: Point -> Point -> [Point]
-generateVerticalLine (x, y1) (_, y2)
-    | y1 == y2 = [(x, y2)]
-    | y1 < y2 = (x, y1) : generateVerticalLine (x, y1 + 1) (x, y2)
-    | otherwise = (x, y1) : generateVerticalLine (x, y1 - 1) (x, y2)
-
-frequencies :: [Point] -> Maybe (Point, Int) -> [(Point, Int)]
-frequencies [] (Just (p, i)) = [(p, i)]
-frequencies (x:xs) Nothing = frequencies xs (Just (x, 1))
-frequencies (x:xs) (Just (p, i))
-    | x == p = frequencies xs (Just (x, i + 1))
-    | otherwise = (p, i) : frequencies xs (Just (x, 1))
-
-filterMultiple :: [(Point, Int)] -> [(Point, Int)]
-filterMultiple = filter (\p -> snd p > 1)
+intersections :: [Coordinate] -> Set Coordinate -> [Coordinate]
+intersections [] _ = []
+intersections (x:xs) seen = if Set.member x seen
+    then x : intersections xs seen
+    else intersections xs (Set.insert x seen)
 
 main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    print (length $ filterMultiple (frequencies (quicksort (concat (generatePoints (filterDiag (parse (lines contents)))))) Nothing))
+    print (Set.size (Set.fromList (intersections (concat (generatePoints (filterDiag (parse (lines contents))))) (Set.fromList []))))

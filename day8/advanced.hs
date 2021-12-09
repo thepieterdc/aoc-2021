@@ -3,9 +3,8 @@ module Main where
 import Data.List
 import System.Environment
 
-quicksort :: (Ord a) => [a] -> [a]
-quicksort [] = []
-quicksort (x:xs) = quicksort [y | y <- xs, y <= x] ++ [x] ++ quicksort [y | y <- xs, y > x]
+import Utils.Filtering (filterByLength, filterContainsSubString)
+import Utils.Sorting (quicksort)
 
 -- Increase legibility.
 type Zero = String
@@ -57,7 +56,7 @@ mapNumbers all (zero, one, two, "", four, five, six, seven, eight, nine) = mapNu
 mapNumbers all (zero, one, "", three, four, five, six, seven, eight, nine) = (zero, one, head all, three, four, five, six, seven, eight, nine)
 
 findZero :: [String] -> Seven -> Zero
-findZero all seven = head (filterContainsString seven (filterByLength 6 all))
+findZero all seven = head (filterContainsSubString seven (filterByLength 6 all))
 
 findOne :: [String] -> One
 findOne = head . filterByLength 2
@@ -81,13 +80,7 @@ findEight :: [String] -> Eight
 findEight = head . filterByLength 7
 
 findNine :: [String] -> Four -> Seven -> Nine
-findNine all four seven = head (filterContainsString (four `union` seven) all)
-
-filterByLength :: Int -> [String] -> [String]
-filterByLength len = filter (\d -> length d == len)
-
-filterContainsString :: String -> [String] -> [String]
-filterContainsString needle = filter (\d -> length (d `intersect` needle) == length needle)
+findNine all four seven = head (filterContainsSubString (four `union` seven) all)
 
 run :: [Observation] -> Int
 run = sum . map runObservation

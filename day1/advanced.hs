@@ -2,19 +2,10 @@ module Main where
 
 import System.Environment
 
-parseInt :: String -> Int
-parseInt a = read a :: Int
+import Utils.Parsing (parseInt)
 
 run :: [Int] -> Int
-run (first:rest) = runRec first rest 0
-
-runRec :: Int -> [Int] -> Int -> Int
-runRec _ [] amount = amount
-runRec prev (current:rest) amount = runRec current rest newAmt
-    where
-    newAmt
-        | current > prev = amount + 1
-        | otherwise = amount
+run n = length (filter (uncurry (<)) (zip n (tail n ++ [0])))
         
 slidingWindowify :: [Int] -> [Int]
 slidingWindowify (a:b:c:rest) = slidingWindowifyHelper a b c rest []

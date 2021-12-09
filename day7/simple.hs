@@ -2,21 +2,13 @@ module Main where
 
 import System.Environment
 
-quicksort :: (Ord a) => [a] -> [a]
-quicksort [] = []
-quicksort (x:xs) = quicksort [y | y <- xs, y <= x] ++ [x] ++ quicksort [y | y <- xs, y > x]
-
-parseInt :: String -> Int
-parseInt a = read a :: Int
+import Utils.Parsing (parseInt)
+import Utils.Sorting (quicksort)
+import Utils.Stat (median)
 
 parse :: String -> [Int]
 parse input = parseInt x : (if rest /= [] then parse (tail rest) else [])
     where (x, rest) = span (/= ',') input
-
-median :: [Int] -> (Int, Int)
-median [x] = (x, x)
-median [x, y] = (x, y)
-median (x:y:xs) = median (tail (reverse xs))
 
 minDistance :: (Int, Int) -> [Int] -> Int
 minDistance (a, b) inputs = if x < y then x else y
