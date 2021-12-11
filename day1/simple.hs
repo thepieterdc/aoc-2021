@@ -5,7 +5,7 @@ import System.Environment
 import Utils.Parsing (parseInt)
         
 run :: [Int] -> Int
-run n = length (filter (uncurry (<)) (zip n (tail n ++ [0])))
+run n = howMany (uncurry (<)) (zip n (tail n ++ [0]))
 
 main :: IO ()
 main = do

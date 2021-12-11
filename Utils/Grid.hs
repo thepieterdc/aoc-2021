@@ -1,6 +1,8 @@
 module Utils.Grid (module Utils.Grid) where
 
 import Data.List
+import Data.Set (Set)
+import qualified Data.Set as Set
 
 type Coordinate = (Int, Int)
 
@@ -15,6 +17,9 @@ floodFill edge grid (x:todo) seen = if edge x
 
 getCoordinates :: Grid a -> [Coordinate]
 getCoordinates grid = [(r, c) | r <- [0..length grid - 1], c <- [0..length (head grid) - 1]]
+
+getAllNeighbours :: Coordinate -> Set Coordinate
+getAllNeighbours (r, c) = Set.fromList [(r + r' - 1, c + c' - 1) | r' <- [0..2], c' <- [0..2]]
 
 -- getOrthogonalNeighbours: gets the vertical and horizontal neighbours.
 getOrthogonalNeighbours :: Grid a -> Coordinate -> [Coordinate]
@@ -31,6 +36,9 @@ getOrthogonalNeighbours grid (r, c) = case (r, c, r + 1 == length grid, c + 1 ==
     (_, 0, _, _) -> [(r - 1, c), (r + 1, c), (r, c + 1)]
     -- Everywhere else.
     (_, _, _, _) -> [(r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)]
+
+isNeighbour :: Coordinate -> Coordinate -> Bool
+isNeighbour (r, c) (r', c') = maximum [r - r', r' - r, c - c', c' - c] <= 1
 
 value :: Grid a -> Coordinate -> a
 value grid (r, c) = (grid !! r) !! c

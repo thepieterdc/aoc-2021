@@ -10,3 +10,6 @@ filterNot f = filter (not . f)
 
 filterContainsSubString :: String -> [String] -> [String]
 filterContainsSubString needle = filter (\d -> length (d `intersect` needle) == length needle)
+
+howMany :: (a -> Bool) -> [a] -> Int
+howMany f items = length (filter f items)

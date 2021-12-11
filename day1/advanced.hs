@@ -2,10 +2,11 @@ module Main where
 
 import System.Environment
 
+import Utils.Filtering (howMany)
 import Utils.Parsing (parseInt)
 
 run :: [Int] -> Int
-run n = length (filter (uncurry (<)) (zip n (tail n ++ [0])))
+run n = howMany (uncurry (<)) (zip n (tail n ++ [0]))
         
 slidingWindowify :: [Int] -> [Int]
 slidingWindowify (a:b:c:rest) = slidingWindowifyHelper a b c rest []
