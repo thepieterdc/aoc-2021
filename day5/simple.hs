@@ -36,4 +36,4 @@ main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    print (Set.size (Set.fromList (intersections (concat (generatePoints (filterDiag (parse (lines contents))))) (Set.fromList []))))
+    print (Set.size (Set.fromList (intersections (concat (generatePoints (filterDiag (parse (lines contents))))) Set.empty)))

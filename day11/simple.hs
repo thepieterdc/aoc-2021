@@ -22,7 +22,7 @@ run state steps = count + run newState (steps - 1)
 
 step :: State -> (State, Int)
 step state = (reset result, countFlashes result)
-    where result = calculateFlashes (Set.fromList []) (increaseEnergy state)
+    where result = calculateFlashes Set.empty (increaseEnergy state)
 
 reset :: State -> State
 reset = map (\(c, l, f) -> (c, if f then 0 else l, False))

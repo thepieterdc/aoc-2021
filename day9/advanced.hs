@@ -13,7 +13,7 @@ parse :: [String] -> Grid Int
 parse = map (map parseCharToInt)
 
 run :: Grid Int -> [Set Coordinate]
-run grid = runForCoordinates grid (getCoordinates grid) (Set.fromList [])
+run grid = runForCoordinates grid (getCoordinates grid) Set.empty
 
 runForCoordinates :: Grid Int -> [Coordinate] -> Set Coordinate -> [Set Coordinate]
 runForCoordinates _ [] _ = []

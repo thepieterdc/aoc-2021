@@ -33,4 +33,4 @@ main :: IO ()
 main = do
     file:_ <- getArgs
     contents <- readFile file
-    print (Set.size (Set.fromList (intersections (concat (generatePoints (parse (lines contents)))) (Set.fromList []))))
+    print (Set.size (Set.fromList (intersections (concat (generatePoints (parse (lines contents)))) Set.empty)))
